@@ -21,6 +21,7 @@ import com.monetization.adsmain.widgets.AdsUiWidget
 import com.monetization.bannerads.BannerAdType
 import com.monetization.composeviews.statefull.bannerAd.SdkBannerViewModel
 import com.monetization.core.commons.AdsCommons.logAds
+import com.monetization.core.listeners.UiAdsListener
 import com.monetization.core.ui.ShimmerInfo
 
 @Composable
@@ -33,6 +34,7 @@ fun SdkBannerAd(
     showNewAdEveryTime: Boolean = true,
     requestNewOnShow: Boolean = false,
     defaultEnable: Boolean = true,
+    listener: UiAdsListener? = null,
     sdkBannerViewModel: SdkBannerViewModel = viewModel(
         factory = GenericViewModelFactory(SdkBannerViewModel::class.java) {
             SdkBannerViewModel()
@@ -45,7 +47,6 @@ fun SdkBannerAd(
     var stateUpdated by rememberSaveable {
         mutableStateOf(false)
     }
-
 
     AndroidView(
         modifier = Modifier
@@ -60,14 +61,15 @@ fun SdkBannerAd(
             val view = if (state.adWidgetMap[adKey] == null) {
                 AdsUiWidget(activity).apply {
                     attachWithLifecycle(lifecycle = lifecycleOwner.lifecycle, true)
-                    setWidgetKey(placementKey, null, defaultEnable)
+                    setWidgetKey(placementKey, adKey, null, defaultEnable)
                     showBannerAdmob(
                         activity = activity,
                         bannerAdType = bannerAdType,
                         adKey = adKey,
                         shimmerInfo = showShimmerLayout,
                         oneTimeUse = showNewAdEveryTime,
-                        requestNewOnShow = requestNewOnShow
+                        requestNewOnShow = requestNewOnShow,
+                        listener = listener,
                     )
                 }
             } else {
@@ -78,7 +80,7 @@ fun SdkBannerAd(
     ) { view ->
         if (stateUpdated.not()) {
             logAds("Banner Ad on Update View Called, is=${true} View=$view")
-            sdkBannerViewModel.updateState(view,adKey)
+            sdkBannerViewModel.updateState(view, adKey)
             stateUpdated = true
         }
     }

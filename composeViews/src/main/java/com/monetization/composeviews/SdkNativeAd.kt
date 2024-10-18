@@ -12,6 +12,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -20,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.monetization.adsmain.widgets.AdsUiWidget
 import com.monetization.composeviews.statefull.nativeAd.SdkNativeViewModel
 import com.monetization.core.commons.AdsCommons.logAds
+import com.monetization.core.listeners.UiAdsListener
 import com.monetization.core.ui.AdsWidgetData
 import com.monetization.core.ui.LayoutInfo
 import com.monetization.core.ui.ShimmerInfo
@@ -36,6 +38,7 @@ fun SdkNativeAd(
     requestNewOnShow: Boolean = false,
     showNewAdEveryTime: Boolean = true,
     defaultEnable: Boolean = true,
+    listener: UiAdsListener? = null,
     sdkNativeViewModel: SdkNativeViewModel = viewModel(
         factory = GenericViewModelFactory(SdkNativeViewModel::class.java) {
             SdkNativeViewModel()
@@ -43,7 +46,7 @@ fun SdkNativeAd(
     ),
 ) {
 
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = LocalSavedStateRegistryOwner.current
     val state by sdkNativeViewModel.state.collectAsState()
     var stateUpdated by rememberSaveable {
         mutableStateOf(false)
@@ -61,14 +64,15 @@ fun SdkNativeAd(
             val view = if (state.adWidgetMap[adKey] == null) {
                 AdsUiWidget(activity).apply {
                     attachWithLifecycle(lifecycle = lifecycleOwner.lifecycle, false)
-                    setWidgetKey(placementKey, adsWidgetData, defaultEnable)
+                    setWidgetKey(placementKey, adKey, adsWidgetData, defaultEnable)
                     showNativeAdmob(
                         activity = activity,
                         adLayout = LayoutInfo.LayoutByName(adLayout),
                         adKey = adKey,
                         shimmerInfo = showShimmerLayout,
                         oneTimeUse = showNewAdEveryTime,
-                        requestNewOnShow = requestNewOnShow
+                        requestNewOnShow = requestNewOnShow,
+                        listener = listener
                     )
                 }
             } else {

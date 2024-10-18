@@ -43,7 +43,7 @@ material3 = { module = "androidx.compose.material3:material3" }
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }
 koin-core = { module = "io.insert-koin:koin-android" }
-main-ads = { module = "com.github.developwithishfaq:mon", version = "2.0-alpha01" }
+main-ads = { module = "com.github.developwithishfaq:mon", version = "2.0-alpha05" }
 fb-shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
 

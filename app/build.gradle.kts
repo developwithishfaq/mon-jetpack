@@ -1,29 +1,26 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
-    id("kotlin-kapt")
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
     alias(libs.plugins.compose.compiler)
+    id("maven-publish")
 }
 
 android {
-    namespace = "com.example.adsxml"
+    namespace = "video.downloader.composeviews"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.adsxml"
         minSdk = 21
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildFeatures {
         compose = true
-        viewBinding = true
     }
-
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -37,10 +34,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
-    }
     kotlinOptions {
         jvmTarget = "17"
     }
@@ -51,27 +44,33 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-
-
-    implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui.ui)
-    implementation(libs.androidx.compose.ui.ui.graphics)
-    implementation(libs.androidx.compose.ui.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3.material3)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.material3)
+
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    api(libs.main.ads)
+
+}
 
 
-    implementation(platform(libs.koin.bom))
-    implementation(libs.koin.core)
-
-    implementation(project(":composeViews"))
-    implementation("io.insert-koin:koin-androidx-compose:3.5.6")
-
-
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            create<MavenPublication>("release") {
+                from(components["release"])
+                groupId = "com.github.developwithishfaq"
+                artifactId = "composeViews"
+                version = "2.1.3"
+            }
+        }
+    }
 }
